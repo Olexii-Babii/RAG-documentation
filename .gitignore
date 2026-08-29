@@ -52,6 +52,7 @@ htmlcov/
 .idea/
 *.swp
 *.swo
+CLAUDE.md
 
 # macOS DS_Store files
 .DS_Store
