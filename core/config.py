@@ -1,17 +1,21 @@
 import os
 
-from dotenv import load_dotenv
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy import URL
 
-load_dotenv()
 
 class Settings(BaseSettings):
-    POSTGRES_USER: str = os.getenv("POSTGRES_USER", "test_user")
-    POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD", "test_password")
-    POSTGRES_HOST: str = os.getenv("POSTGRES_HOST", "test_host")
-    POSTGRES_DB_PORT: int = int(os.getenv("POSTGRES_DB_PORT", 5432))
-    POSTGRES_DB: str = os.getenv("POSTGRES_DB", "test_db")
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
+
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_HOST: str
+    POSTGRES_PORT: int = 5432
+    POSTGRES_DB: str
 
     DB_POOL_SIZE: int = 5
     DB_MAX_OVERFLOW: int = 10
@@ -27,9 +31,9 @@ class Settings(BaseSettings):
             username=self.POSTGRES_USER,
             password=self.POSTGRES_PASSWORD,
             host=self.POSTGRES_HOST,
-            port=self.POSTGRES_DB_PORT,
+            port=self.POSTGRES_PORT,
             database=self.POSTGRES_DB
         )
 
 
-settings = Settings()
+settings = Settings() #type: ignore[call-arg]
