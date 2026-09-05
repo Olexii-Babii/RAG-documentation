@@ -1,5 +1,6 @@
 from logging.config import fileConfig
 
+import pgvector.sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy import pool
 
@@ -29,6 +30,12 @@ target_metadata = Base.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
+def render_item(type_, obj, autogen_context):
+    if type_ == "type" and isinstance(obj, pgvector.sqlalchemy.Vector):
+        autogen_context.imports.add("import pgvector.sqlalchemy")
+        return "pgvector.sqlalchemy.Vector(%r)" % obj.dim
+    return False
+
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
@@ -48,7 +55,8 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
-        compare_type=True
+        compare_type=True,
+        render_item=render_item
     )
 
     with context.begin_transaction():
@@ -71,7 +79,8 @@ def run_migrations_online() -> None:
         context.configure(
             connection=connection,
             target_metadata=target_metadata,
-            compare_type=True
+            compare_type=True,
+            render_item=render_item
         )
 
         with context.begin_transaction():
