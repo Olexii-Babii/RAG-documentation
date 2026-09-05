@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     DB_POOL_PRE_PING: bool = True
     DB_ECHO: bool = False
 
+    EMBEDDING_MODEL: str = "all-MiniLM-L6-v2"
+    EMBEDDING_DIM: int = 384
+
 
     def create_db_url(self, driver_name: str) -> URL:
         return URL.create(
