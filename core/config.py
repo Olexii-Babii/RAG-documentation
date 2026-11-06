@@ -27,15 +27,16 @@ class Settings(BaseSettings):
     EMBEDDING_MODEL: str = "all-MiniLM-L6-v2"
     EMBEDDING_DIM: int = 384
 
+    POSTGRES_TEST_DB: str = "rag_system_test"
 
-    def create_db_url(self, driver_name: str) -> URL:
+    def create_db_url(self, driver_name: str, database: str | None = None) -> URL:
         return URL.create(
             drivername=driver_name,
             username=self.POSTGRES_USER,
             password=self.POSTGRES_PASSWORD,
             host=self.POSTGRES_HOST,
             port=self.POSTGRES_PORT,
-            database=self.POSTGRES_DB
+            database=database or self.POSTGRES_DB,
         )
 
 

@@ -1,3 +1,4 @@
+import os
 from logging.config import fileConfig
 
 import pgvector.sqlalchemy
@@ -24,6 +25,10 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 target_metadata = Base.metadata
+
+# set by tests/conftest.py to point migrations at the test database instead
+# of the dev one; unset -> normal dev DB from settings
+_TARGET_DB = os.environ.get("ALEMBIC_TARGET_DB")
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -58,7 +63,7 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = settings.create_db_url("postgresql+psycopg2").render_as_string(hide_password=False)
+    url = settings.create_db_url("postgresql+psycopg2", database=_TARGET_DB).render_as_string(hide_password=False)
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -81,7 +86,7 @@ def run_migrations_online() -> None:
 
     """
     connectable = create_engine(
-        settings.create_db_url("postgresql+psycopg2"),
+        settings.create_db_url("postgresql+psycopg2", database=_TARGET_DB),
         poolclass=pool.NullPool,
     )
 
