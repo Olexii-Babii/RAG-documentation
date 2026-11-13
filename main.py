@@ -7,7 +7,10 @@ from anyio import to_thread
 
 from core.config import settings
 from core.db_async import async_engine
+from core.exceptions import source_not_found_handler
+from routers.ingestion import router as ingestion_router
 from sentence_transformers import SentenceTransformer
+from services.ingestion import SourceNotFoundError
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -27,6 +30,9 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+app.add_exception_handler(SourceNotFoundError, source_not_found_handler)
+app.include_router(ingestion_router)
+
 
 @app.get("/")
 def read_root():
