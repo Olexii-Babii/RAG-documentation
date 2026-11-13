@@ -8,6 +8,7 @@ from services.chunking import ChunkingService, HFTokenCounter
 from services.fetcher import DocumentFetcher
 from services.ingestion import IngestionService
 from services.parsing import DocumentParser
+from services.sources import SourceService
 
 
 def get_embedding_service(request: Request) -> EmbeddingService:
@@ -29,6 +30,10 @@ def get_fetcher_service(fetcher_client: httpx.AsyncClient = Depends(get_fetch_cl
 
 def get_parser_service() -> DocumentParser:
     return DocumentParser()
+
+
+def get_source_service(session: AsyncSession = Depends(get_db)) -> SourceService:
+    return SourceService(session)
 
 
 def get_ingestion_service(
