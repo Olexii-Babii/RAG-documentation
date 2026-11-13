@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 
+import httpx
 from fastapi import FastAPI
 from sqlalchemy import text
 from anyio import to_thread
@@ -18,8 +19,10 @@ async def lifespan(app: FastAPI):
         raise RuntimeError("Embedding model dimension does not match settings")
 
     app.state.embedding_model = model
+    app.state.fetch_client = httpx.AsyncClient()
     yield
 
+    await app.state.fetch_client.aclose()
     await async_engine.dispose()
 
 
