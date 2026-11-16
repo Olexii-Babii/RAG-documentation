@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 
+import anthropic
 import httpx
 from fastapi import FastAPI
 from sqlalchemy import text
@@ -8,6 +9,7 @@ from anyio import to_thread
 from core.config import settings
 from core.db_async import async_engine
 from core.exceptions import source_not_found_handler
+from core.llm import LLMClient
 from routers.ingestion import router as ingestion_router
 from sentence_transformers import SentenceTransformer
 from services.ingestion import SourceNotFoundError
@@ -23,10 +25,12 @@ async def lifespan(app: FastAPI):
 
     app.state.embedding_model = model
     app.state.fetch_client = httpx.AsyncClient()
+    app.state.llm_client = LLMClient(anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY))
     yield
 
     await app.state.fetch_client.aclose()
     await async_engine.dispose()
+    await app.state.llm_client.close()
 
 
 app = FastAPI(lifespan=lifespan)

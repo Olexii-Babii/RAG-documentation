@@ -3,6 +3,7 @@ from fastapi import Request, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.db_async import get_db
+from core.llm import LLMClient
 from services.embedding import EmbeddingService
 from services.chunking import ChunkingService, HFTokenCounter
 from services.fetcher import DocumentFetcher
@@ -51,3 +52,7 @@ def get_ingestion_service(
         parser=parser,
         fetcher=fetcher,
     )
+
+
+def get_llm_client(request: Request) -> LLMClient:
+    return request.app.state.llm_client
