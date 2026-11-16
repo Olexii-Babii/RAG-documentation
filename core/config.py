@@ -29,6 +29,8 @@ class Settings(BaseSettings):
 
     POSTGRES_TEST_DB: str = "rag_system_test"
 
+    ANTHROPIC_API_KEY: str
+
     def create_db_url(self, driver_name: str, database: str | None = None) -> URL:
         return URL.create(
             drivername=driver_name,
